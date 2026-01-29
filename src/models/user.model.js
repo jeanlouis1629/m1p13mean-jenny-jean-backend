@@ -1,0 +1,15 @@
+const mongoose = require('mongoose');
+
+const UserSchema = new mongoose.Schema({
+  nom: String,
+  email: String,
+  password: String,
+  role: {
+    type: String,
+    enum: ['ADMIN', 'SHOP', 'USER'],
+    default: 'USER'
+  },
+  actif: { type: Boolean, default: true }
+});
+
+module.exports = mongoose.model('User', UserSchema);
