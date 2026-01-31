@@ -8,6 +8,7 @@ connectDB();
 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/auth', require('./src/routes/auth.routes'));
 //app.use('/api/boutiques', require('./src/routes/boutique.routes'));
