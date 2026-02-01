@@ -2,22 +2,15 @@ const Boutique = require('../models/boutique.model');
 
 exports.createBoutique = async (req, res) => {
     try {
-      // 🔐 owner depuis le token
-      const ownerId = req.user.id;
-  
-      if (!mongoose.Types.ObjectId.isValid(ownerId)) {
-        return res.status(400).json({ message: "Owner invalide" });
-      }
-  
       const boutique = new Boutique({
         nom: req.body.nom,
+        code: req.body.code,
         description: req.body.description,
-        owner: ownerId,
         loyerMensuel: req.body.loyerMensuel,
         tauxCommission: req.body.tauxCommission,
-        active: false // validation admin obligatoire
+        active: false
       });
-  
+      
       await boutique.save();
   
       res.status(201).json({
