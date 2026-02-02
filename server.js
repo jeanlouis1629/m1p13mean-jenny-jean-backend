@@ -12,7 +12,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/auth', require('./src/routes/auth.routes'));
 app.use('/api/boutiques', require('./src/routes/boutique.routes'));
-//app.use('/api/produits', require('./src/routes/produit.routes'));
+app.use('/api/produits', require('./src/routes/produit.routes'));
 //app.use('/api/commandes', require('./src/routes/commande.routes'));
 
 const PORT = process.env.PORT || 3000;

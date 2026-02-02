@@ -60,3 +60,16 @@ exports.login = async (req, res) => {
     return res.status(500).json({ message: "Erreur serveur" });
   }
 };
+exports.register = async (req, res) => {
+  const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
+  const user = new User({
+    name: req.body.name,
+    email: req.body.email,
+    password: hashedPassword,
+    role: req.body.role
+  });
+
+  await user.save();
+  res.status(201).json({ message: "Utilisateur créé" });
+};
