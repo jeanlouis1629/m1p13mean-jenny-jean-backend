@@ -8,6 +8,7 @@ const CommandeSchema = new mongoose.Schema({
       quantite: Number
     }
   ],
+  boutiques: {type:mongoose.Schema.Types.ObjectId, ref:'Boutiques'},
   total: Number,
   date: { type: Date, default: Date.now }
 });

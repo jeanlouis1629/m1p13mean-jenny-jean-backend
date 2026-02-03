@@ -1,5 +1,5 @@
 const Produit = require('../models/produit.model');
-
+//insert
 exports.createProduit = async (req , res) =>{
     try{
         const produit = new Produit({
@@ -24,6 +24,7 @@ exports.createProduit = async (req , res) =>{
         });
     }
 };
+//liste
 exports.getProduit = async(req,res)=>{
     try{
         let filtrer ={}
@@ -39,3 +40,42 @@ exports.getProduit = async(req,res)=>{
           });
     }
 }
+//update
+exports.updateProduit = async(req,res)=>{
+    try{
+      const produits = await Produit.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        {new: true}
+      );
+      res.json(produits);
+    }catch (error){
+        res.status(500).json({
+            message: 'Erreur lors de la récupération des Produits'
+          });
+    }
+};
+//Delete
+exports.deleteProduit = async(req,res)=>{
+    try {
+        const { id } = req.params;
+    
+        const produit = await Produit.findById(id);
+        if (!produit) {
+          return res.status(404).json({
+            message: "Produit introuvable"
+          });
+        }
+    
+        await Produit.findByIdAndDelete(id);
+    
+        return res.status(200).json({
+          message: "Produit supprimé définitivement"
+        });
+    }catch (error){
+        onsole.error("Erreur deleteProduit :", error);
+    return res.status(500).json({
+      message: "Erreur lors de la suppression du produit"
+    });
+    }  
+};
