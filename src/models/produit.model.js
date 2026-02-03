@@ -5,7 +5,7 @@ const ProduitSchema = new mongoose.Schema({
   prix: {type: Number,required: true},
   description: { type: String },
   stock: {type: Number,required:true},
-  boutiqueId: { type: mongoose.Schema.Types.ObjectId, ref: 'Boutique' },
+  boutiqueId: { type: mongoose.Schema.Types.ObjectId, ref: 'Boutiques' },
   statut: { type: Boolean, default: false },
   image: {type: String}
 },{timestamps:true});
