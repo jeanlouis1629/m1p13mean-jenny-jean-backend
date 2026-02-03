@@ -77,7 +77,7 @@ exports.updateBoutique = async (req, res) => {
   }
 };
 
-// ✅ Valider / Désactiver
+//Activation
 exports.toggleBoutique = async (req, res) => {
   const boutique = await Boutique.findById(req.params.id);
   if (!boutique) return res.status(404).json({ message: 'Boutique introuvable' });
@@ -89,6 +89,7 @@ exports.toggleBoutique = async (req, res) => {
     message: boutique.active ? 'Boutique activée' : 'Boutique désactivée'
   });
 };
+//chiffreDaffaire
 exports.getPerformance = async (req, res) => {
     const { id, mois, annee } = req.params;
 
@@ -111,4 +112,23 @@ exports.getPerformance = async (req, res) => {
       commission,
       profit
   });
+};
+//Nombre total boutique
+exports.getNombreBoutique = async(req,res)=>{
+  try {
+    const total = await Boutique.countDocuments();
+    const actives = await Boutique.countDocuments({ active: true });
+    const inactives = await Boutique.countDocuments({ active: false });
+
+    return res.json({
+      total,
+      actives,
+      inactives
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      message: "Erreur lors du calcul des statistiques"
+    });
+  }
 };
