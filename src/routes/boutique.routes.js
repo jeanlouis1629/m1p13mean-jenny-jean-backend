@@ -6,5 +6,6 @@ router.get('/liste', controller.getBoutique);
 router.delete('/:id/delete', controller.deleteBoutique);
 router.put('/:id/update', controller.updateBoutique);
 router.patch('/:id/activation', controller.toggleBoutique);
+router.get('/:id/performance/:mois/:annee', controller.getPerformance);
 
 module.exports = router;

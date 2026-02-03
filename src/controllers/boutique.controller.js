@@ -1,4 +1,5 @@
 const Boutique = require('../models/boutique.model');
+const Performance =require('../models/performance.model');
 
 exports.createBoutique = async (req, res) => {
     try {
@@ -86,5 +87,28 @@ exports.toggleBoutique = async (req, res) => {
 
   res.json({
     message: boutique.active ? 'Boutique activée' : 'Boutique désactivée'
+  });
+};
+exports.getPerformance = async (req, res) => {
+    const { id, mois, annee } = req.params;
+
+    const boutique = await Boutique.findById(id);
+    if (!boutique) return res.status(404).json({ message: 'Boutique introuvable' });
+
+    const perf = await Performance.findOne({ boutique: id, mois, annee });
+    if (!perf) return res.json({ message: 'Aucune donnée pour ce mois' });
+
+    const commission = perf.chiffreAffaire * boutique.tauxCommission / 100;
+    const chargesTotales = boutique.loyerMensuel + perf.charges;
+    const profit = perf.chiffreAffaire - chargesTotales - commission;
+
+    res.json({
+      boutique: boutique.nom,
+      mois,
+      annee,
+      chiffreAffaire: perf.chiffreAffaire,
+      charges: perf.charges,
+      commission,
+      profit
   });
 };
