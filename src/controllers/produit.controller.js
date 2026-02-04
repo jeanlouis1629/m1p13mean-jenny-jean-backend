@@ -40,6 +40,29 @@ exports.getProduit = async(req,res)=>{
           });
     }
 }
+//liste unique
+exports.getProduitById = async(req,res)=>{
+    try{
+        const produit = await Produit.findById(req.params.id)
+        .populate('boutiqueId','nom code');
+        res.json(produit);
+    }catch (error){
+        res.status(500).json({
+            message: 'Erreur lors de la récupération des Produits'
+          });
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
 //update
 exports.updateProduit = async(req,res)=>{
     try{
