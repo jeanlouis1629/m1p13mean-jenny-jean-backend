@@ -52,17 +52,6 @@ exports.getProduitById = async(req,res)=>{
           });
     }
 };
-
-
-
-
-
-
-
-
-
-
-
 //update
 exports.updateProduit = async(req,res)=>{
     try{
