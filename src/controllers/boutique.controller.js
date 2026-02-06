@@ -39,6 +39,21 @@ exports.getBoutique = async (req, res) => {
         });
       }
     };
+
+
+    //liste unique
+    exports.getBoutiqueById = async(req,res)=>{
+        try{
+            const boutique = await Boutique.findById(req.params.id)
+            .populate('owner', 'name email')
+            res.json(boutique);
+        }catch (error){
+            res.status(500).json({
+                message: 'Erreur lors de la récupération des Produits'
+              });
+        }
+    };
+    
     //delete
     exports.deleteBoutique = async (req, res) => {
         try {
@@ -77,18 +92,27 @@ exports.updateBoutique = async (req, res) => {
   }
 };
 
-//Activation
+// Activation / Désactivation
 exports.toggleBoutique = async (req, res) => {
   const boutique = await Boutique.findById(req.params.id);
-  if (!boutique) return res.status(404).json({ message: 'Boutique introuvable' });
+  if (!boutique) {
+    return res.status(404).json({ message: 'Boutique introuvable' });
+  }
 
-  boutique.active = !boutique.active;
-  await boutique.save();
+  const newStatus = !boutique.active;
+
+  await Boutique.findByIdAndUpdate(
+    req.params.id,
+    { active: newStatus },
+    { new: true }
+  );
 
   res.json({
-    message: boutique.active ? 'Boutique activée' : 'Boutique désactivée'
+    message: newStatus ? 'Boutique activée' : 'Boutique désactivée',
+    active: newStatus
   });
 };
+
 //chiffreDaffaire
 exports.getPerformance = async (req, res) => {
     const { id, mois, annee } = req.params;

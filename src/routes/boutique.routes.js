@@ -3,6 +3,7 @@ const controller = require('../controllers/boutique.controller');
 
 router.post('/create', controller.createBoutique);
 router.get('/liste', controller.getBoutique);
+router.get('/liste/:id', controller.getBoutiqueById);
 router.delete('/:id/delete', controller.deleteBoutique);
 router.put('/:id/update', controller.updateBoutique);
 router.patch('/:id/activation', controller.toggleBoutique);
