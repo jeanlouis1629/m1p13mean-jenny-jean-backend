@@ -8,6 +8,7 @@ exports.createBoutique = async (req, res) => {
         code: req.body.code,
         description: req.body.description,
         loyerMensuel: req.body.loyerMensuel,
+        owner: req.body.owner,
         tauxCommission: req.body.tauxCommission,
         active: false
       });

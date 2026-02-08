@@ -73,3 +73,13 @@ exports.register = async (req, res) => {
   await user.save();
   res.status(201).json({ message: "Utilisateur créé" });
 };
+
+exports.selectShop = async (req, res) => {
+  try {
+    const shop = await User.find({ role: 'SHOP' });
+    res.json(shop);
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+
+}
