@@ -50,7 +50,7 @@ exports.getBoutique = async (req, res) => {
             res.json(boutique);
         }catch (error){
             res.status(500).json({
-                message: 'Erreur lors de la récupération des Produits'
+                message: 'Erreur lors de la récupération des boutiques'
               });
         }
     };

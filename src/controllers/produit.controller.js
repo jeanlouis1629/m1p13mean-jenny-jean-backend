@@ -1,4 +1,5 @@
 const Produit = require('../models/produit.model');
+const mongoose = require('mongoose');
 //insert
 exports.createProduit = async (req , res) =>{
     try{
@@ -52,7 +53,52 @@ exports.getProduitById = async(req,res)=>{
           });
     }
 };
-//update
+//liste produit par boutique
+exports.getProduitByIDBoutique = async (req, res) => {
+    try {
+      const { idBoutique } = req.params;
+  
+      console.log('ID boutique reçu :', idBoutique);
+  
+      const produits = await Produit.aggregate([
+        {
+          $addFields: {
+            boutiqueIdStr: {
+              $cond: [
+                { $eq: [{ $type: '$boutiqueId' }, 'object'] },
+                { $toString: '$boutiqueId._id' },
+                { $toString: '$boutiqueId' }
+              ]
+            }
+          }
+        },
+        {
+          $match: {
+            boutiqueIdStr: idBoutique
+          }
+        }
+      ]);
+  
+      console.log('Produits trouvés BRUTS :', produits);
+  
+      if (!produits || produits.length === 0) {
+        return res.status(404).json({
+          message: 'Aucun produit trouvé pour cette boutique'
+        });
+      }
+  
+      res.status(200).json(produits);
+  
+    } catch (error) {
+      console.error('Erreur getProduitByIDBoutique :', error);
+      res.status(500).json({
+        message: 'Erreur serveur',
+        error: error.message
+      });
+    }
+  };
+          
+  //update
 exports.updateProduit = async(req,res)=>{
     try{
       const produits = await Produit.findByIdAndUpdate(
