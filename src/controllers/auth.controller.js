@@ -83,3 +83,33 @@ exports.selectShop = async (req, res) => {
   }
 
 }
+
+exports.selectAllUser = async (req, res) => {
+  try {
+    const users = await User.find({role: 'USER'});
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+
+}
+// Activation / Désactivation
+exports.toggleUser = async (req, res) => {
+  const user = await User.findById(req.params.id);
+  if (!user) {
+    return res.status(404).json({ message: 'User introuvable' });
+  }
+
+  const newStatus = !user.actif ;
+
+  await User.findByIdAndUpdate(
+    req.params.id,
+    { actif: newStatus },
+    { new: true }
+  );
+
+  res.json({
+    message: newStatus ? 'User activée' : 'User désactivée',
+    actif: newStatus
+  });
+};
