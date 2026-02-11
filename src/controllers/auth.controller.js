@@ -38,7 +38,8 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       {
         id: user._id,
-        role: user.role
+        role: user.role,
+        name: user.name,
       },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRE }
@@ -93,6 +94,7 @@ exports.selectAllUser = async (req, res) => {
   }
 
 }
+
 // Activation / Désactivation
 exports.toggleUser = async (req, res) => {
   const user = await User.findById(req.params.id);
