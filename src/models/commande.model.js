@@ -8,9 +8,24 @@ const CommandeSchema = new mongoose.Schema({
       quantite: Number
     }
   ],
-  boutiques: {type:mongoose.Schema.Types.ObjectId, ref:'Boutiques'},
-  total: Number,
-  date: { type: Date, default: Date.now }
-});
-
-module.exports = mongoose.model('Commande', CommandeSchema);
+  idBoutiques: {type:mongoose.Schema.Types.ObjectId, ref:'Boutiques'},
+  total: {type: Number, required:true},
+  date: { type: Date, default: Date.now },
+  dateLivraison: { type: Date, required:true},
+  modeLivraison: {
+    type: String,
+    enum: ['Recuperation', 'Livraison'],
+    required: true
+  },
+  adresseLivraison: {
+    latitude: Number,
+    longitude: Number,
+    adresseTexte: String
+  },
+  statut: {
+    type: String,
+    enum: ['En attente', 'Confirmée', 'Livrée','Annuler'],
+    default: 'En attente'
+  }
+},{ timestamps: true });
+module.exports = mongoose.model('commandes', CommandeSchema,'commandes');

@@ -4,6 +4,7 @@ const BoutiqueSchema = new mongoose.Schema({
   nom: { type: String, required: true },
   code: { type: String, required: true, unique: true },
   description: { type: String },
+  categorie: {type: mongoose.Schema.Types.ObjectId, ref:'categorieBoutique', default: null },
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null},
   loyerMensuel: { type: Number, required: true },
   tauxCommission: { type: Number, required: true },
