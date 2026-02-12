@@ -108,17 +108,35 @@ exports.ajouterCommande = async (req, res) => {
     try {
       const { idBoutique } = req.params;
   
-      const commandes = await Commande.find({ idBoutiques: idBoutique })
+      const commandes = await Commande.find()
         .populate('acheteur')
-        .populate('produits.produit')
-        .sort({ createdAt: -1 });
+        .populate({
+          path: 'produits.produit',
+          model: 'produits'
+        });
   
-      res.status(200).json(commandes);
+      const commandesFiltrees = commandes
+        .map(cmd => {
+          const produitsFiltres = cmd.produits.filter(p =>
+            p.produit && p.produit.boutiqueId.toString() === idBoutique
+          );
+  
+          if (produitsFiltres.length > 0) {
+            return {
+              ...cmd.toObject(),
+              produits: produitsFiltres
+            };
+          }
+        })
+        .filter(Boolean);
+  
+      res.status(200).json(commandesFiltrees);
   
     } catch (error) {
       res.status(500).json({
-        message: "Erreur récupération commandes",
+        message: "Erreur récupération commandes boutique",
         error: error.message
       });
     }
   };
+  
