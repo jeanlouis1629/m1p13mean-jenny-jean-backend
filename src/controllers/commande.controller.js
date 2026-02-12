@@ -7,11 +7,26 @@ exports.ajouterCommande = async (req, res) => {
       const {
         acheteur,
         produits,
-        total,
         dateLivraison,
         modeLivraison,
         adresseLivraison
       } = req.body;
+
+      if (!produits || produits.length === 0) {
+        return res.status(400).json({ message: "Aucun produit sélectionné" });
+      }
+  
+      let total = 0;
+  
+      for (let item of produits) {
+        const produitDB = await Produit.findById(item.produit);
+  
+        if (!produitDB) {
+          return res.status(404).json({ message: "Produit introuvable" });
+        }
+  
+        total += produitDB.prix * item.quantite;
+      }
   
       const nouvelleCommande = new Commande({
         acheteur,
