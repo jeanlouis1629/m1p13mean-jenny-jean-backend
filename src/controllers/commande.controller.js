@@ -7,7 +7,6 @@ exports.ajouterCommande = async (req, res) => {
       const {
         acheteur,
         produits,
-        idBoutiques,
         total,
         dateLivraison,
         modeLivraison,
@@ -17,7 +16,6 @@ exports.ajouterCommande = async (req, res) => {
       const nouvelleCommande = new Commande({
         acheteur,
         produits,
-        idBoutiques,
         total,
         dateLivraison,
         modeLivraison,

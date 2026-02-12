@@ -8,7 +8,6 @@ const CommandeSchema = new mongoose.Schema({
       quantite: Number
     }
   ],
-  idBoutiques: {type:mongoose.Schema.Types.ObjectId, ref:'Boutiques'},
   total: {type: Number, required:true},
   date: { type: Date, default: Date.now },
   dateLivraison: { type: Date, required:true},
