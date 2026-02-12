@@ -52,3 +52,29 @@ exports.mouvementStock = async (req, res) => {
     });
   }
 };
+
+exports.getStockProduit = async (req, res) => {
+  try {
+    const { produitId } = req.params;
+
+    const mouvements = await MouvementStock.find({ produitId });
+
+    let stock = 0;
+
+    mouvements.forEach(m => {
+      if (m.typeMouvement === "ENTREE") {
+        stock += m.quantite;
+      } else {
+        stock -= m.quantite;
+      }
+    });
+
+    res.status(200).json({ stock });
+
+  } catch (error) {
+    res.status(500).json({
+      message: "Erreur calcul stock",
+      error: error.message
+    });
+  }
+};
