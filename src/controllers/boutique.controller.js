@@ -1,30 +1,64 @@
+const mongoose = require('mongoose');
 const Boutique = require('../models/boutique.model');
 const Performance =require('../models/performance.model');
+const Categorie = require('../models/CategorieBoutique');
+const User = require('../models/user.model');
 
 exports.createBoutique = async (req, res) => {
-    try {
-      const boutique = new Boutique({
-        nom: req.body.nom,
-        code: req.body.code,
-        description: req.body.description,
-        loyerMensuel: req.body.loyerMensuel,
-        owner: req.body.owner,
-        tauxCommission: req.body.tauxCommission,
-        active: false
-      });
-      
-      await boutique.save();
-  
-      res.status(201).json({
-        message: "Boutique créée, en attente de validation",
-        boutique
-      });
-    } catch (error) {
-      res.status(400).json({
-        message: error.message
-      });
+  try {
+
+    const {
+      nom,
+      code,
+      description,
+      loyerMensuel,
+      categorie,
+      owner,
+      tauxCommission
+    } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(categorie)) {
+      return res.status(400).json({ message: "Categorie invalide" });
     }
-  };
+
+    if (!mongoose.Types.ObjectId.isValid(owner)) {
+      return res.status(400).json({ message: "Owner invalide" });
+    }
+
+    const categorieExiste = await Categorie.findById(categorie);
+    if (!categorieExiste) {
+      return res.status(404).json({ message: "Categorie introuvable" });
+    }
+
+    const ownerExiste = await User.findById(owner);
+    if (!ownerExiste) {
+      return res.status(404).json({ message: "Owner introuvable" });
+    }
+
+    const boutique = new Boutique({
+      nom,
+      code,
+      description,
+      loyerMensuel,
+      categorie,  // ← on stocke juste l’ID
+      owner,      // ← on stocke juste l’ID
+      tauxCommission,
+      active: false
+    });
+
+    await boutique.save();
+
+    res.status(201).json({
+      message: "Boutique créée, en attente de validation",
+      boutique
+    });
+
+  } catch (error) {
+    res.status(400).json({
+      message: error.message
+    });
+  }
+};
 //liste
 exports.getBoutique = async (req, res) => {
     try {
@@ -42,42 +76,42 @@ exports.getBoutique = async (req, res) => {
     };
 
 
-    //liste unique
-    exports.getBoutiqueById = async(req,res)=>{
-        try{
-            const boutique = await Boutique.findById(req.params.id)
-            .populate('owner', 'name email')
-            res.json(boutique);
-        }catch (error){
-            res.status(500).json({
-                message: 'Erreur lors de la récupération des boutiques'
-              });
-        }
-    };
-    
-    //delete
-    exports.deleteBoutique = async (req, res) => {
-        try {
-          const boutique = await Boutique.findById(req.params.id);
-      
-          if (!boutique) {
-            return res.status(404).json({
-              message: 'Boutique introuvable'
+  //liste unique
+  exports.getBoutiqueById = async(req,res)=>{
+      try{
+          const boutique = await Boutique.findById(req.params.id)
+          .populate('owner', 'name email')
+          res.json(boutique);
+      }catch (error){
+          res.status(500).json({
+              message: 'Erreur lors de la récupération des boutiques'
             });
-          }
-      
-          boutique.active = false;
-          await boutique.save();
-      
-          res.json({
-            message: 'Boutique désactivée avec succès'
-          });
-        } catch (error) {
-          res.status(400).json({
-            message: 'ID invalide'
-          });
-        }
-      };
+      }
+  };
+    
+//delete
+exports.deleteBoutique = async (req, res) => {
+    try {
+      const boutique = await Boutique.findById(req.params.id);
+  
+      if (!boutique) {
+        return res.status(404).json({
+          message: 'Boutique introuvable'
+        });
+      }
+  
+      boutique.active = false;
+      await boutique.save();
+  
+      res.json({
+        message: 'Boutique désactivée avec succès'
+      });
+    } catch (error) {
+      res.status(400).json({
+        message: 'ID invalide'
+      });
+    }
+  };
 
 // ✏️ Modifier boutique
 exports.updateBoutique = async (req, res) => {
