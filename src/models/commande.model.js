@@ -13,13 +13,28 @@ const CommandeSchema = new mongoose.Schema({
   dateLivraison: { type: Date, required:true},
   modeLivraison: {
     type: String,
-    enum: ['Recuperation', 'Livraison'],
+    enum: ['retrait', 'livraison'],
     required: true
   },
   adresseLivraison: {
-    latitude: Number,
-    longitude: Number,
-    adresseTexte: String
+    latitude: {
+      type: Number,
+      required: function () {
+        return this.modeLivraison === 'livraison';
+      }
+    },
+    longitude: {
+      type: Number,
+      required: function () {
+        return this.modeLivraison === 'livraison';
+      }
+    },
+    adresseTexte: {
+      type: String,
+      required: function () {
+        return this.modeLivraison === 'livraison';
+      }
+    }
   },
   statut: {
     type: String,

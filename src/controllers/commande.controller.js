@@ -34,7 +34,7 @@ exports.ajouterCommande = async (req, res) => {
         total,
         dateLivraison,
         modeLivraison,
-        adresseLivraison: modeLivraison === 'Livraison' ? adresseLivraison : null,
+        adresseLivraison: modeLivraison === 'livraison' ? adresseLivraison : "akoor",
         statut: "En attente"
       });
   
@@ -67,7 +67,6 @@ exports.ajouterCommande = async (req, res) => {
         return res.status(404).json({ message: "Commande introuvable" });
       }
   
-      // 🔥 Si on passe à Confirmée ET que ce n'était pas déjà Confirmée
       if (statut === "Confirmée" && commande.statut !== "Confirmée") {
   
         for (let item of commande.produits) {
