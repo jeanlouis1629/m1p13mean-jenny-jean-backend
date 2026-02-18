@@ -8,5 +8,4 @@ router.get('/selectShop', authCtrl.selectShop);
 router.get('/selectAllUser', authCtrl.selectAllUser);
 router.patch('/:id/activation', authCtrl.toggleUser);
 
-
 module.exports = router;

@@ -8,7 +8,6 @@ const PerfomanceSchema = new mongoose.Schema({
       },
       mois: { type: Number, required: true },
       annee: { type: Number, required: true },
-    
       chiffreAffaire: { type: Number, default: 0 },
       charges: { type: Number, default: 0 },
 }, { timestamps: true });

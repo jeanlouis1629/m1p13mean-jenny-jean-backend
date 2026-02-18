@@ -87,7 +87,7 @@ exports.selectShop = async (req, res) => {
 
 exports.selectAllUser = async (req, res) => {
   try {
-    const users = await User.find({role: 'USER'});
+    const users = await User.find({role: {$in: ['USER','SHOP']} });
     res.json(users);
   } catch (error) {
     res.status(500).json({ message: "Erreur serveur" });
