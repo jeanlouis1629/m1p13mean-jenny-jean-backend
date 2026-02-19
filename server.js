@@ -17,6 +17,7 @@ app.use('/api/stock', require('./src/routes/gestionStock.routes'));
 app.use('/api/categorie', require('./src/routes/categorie.routes'));
 app.use('/api/commandes', require('./src/routes/commande.routes'));
 app.use('/api/recherche', require('./src/routes/recherche.route'));
+app.use('/api/dashboard', require('./src/routes/dashboardBoutique.routes'));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>
