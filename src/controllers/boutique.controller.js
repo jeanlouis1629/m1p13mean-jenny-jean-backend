@@ -88,7 +88,19 @@ exports.getBoutique = async (req, res) => {
             });
       }
   };
-    
+  exports.getBoutiqueUser = async(req,res)=>{
+    try{
+        const ownerId = new mongoose.Types.ObjectId(req.params.owner);
+
+        const boutique = await Boutique.find({ owner: ownerId });
+        console.log('Owner ID reçu :', req.params.owner);
+        res.json(boutique);
+    }catch (error){
+        res.status(500).json({
+            message: 'Erreur lors de la récupération des boutiques'
+          });
+    }
+};
 //delete
 exports.deleteBoutique = async (req, res) => {
     try {
