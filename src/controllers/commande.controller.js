@@ -138,4 +138,26 @@ exports.ajouterCommande = async (req, res) => {
       });
     }
   };
+  exports.historiqueCommandes = async (req, res)=>{
+    try{
+      const {acheteur} = req.params;
+      const objectId = new mongoose.Types.ObjectId(acheteur);
+      const historique = await Commande.find({ acheteur: objectId })
+        .populate('acheteur')
+        .populate({
+          path: 'produits.produit',
+          model: 'produits'})
+        .sort({ createdAt: -1 });
+        res.status(201).json({
+          message: "historique de commande",
+          total: historique.length,
+          historique
+        });
+    }catch(error){
+      res.status(500).json({
+        message: "error recupedration des commandes par client",
+        error: error.message
+      });
+    }
+  } ;
   

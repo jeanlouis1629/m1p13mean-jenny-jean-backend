@@ -1,10 +1,16 @@
 const Commande = require('../models/commande.model');
 const Produit = require('../models/produit.model');
+const Depense = require('../models/depense.model');
 const mongoose = require('mongoose');
 
 exports.getDashboardStats = async (req, res) => {
   try {
+    
+    const { boutique } = req.params;
+    const objectIdv = new mongoose.Types.ObjectId(boutique);
+
     const { boutiqueId } = req.params;
+    const objectId = new mongoose.Types.ObjectId(boutiqueId);
 
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
@@ -15,6 +21,33 @@ exports.getDashboardStats = async (req, res) => {
     const monthStart = new Date();
     monthStart.setDate(1);
     monthStart.setHours(0, 0, 0, 0);
+
+    const chiffreAffaire = await Commande.aggregate([
+      { $unwind: '$produits' },
+      {
+        $lookup: {
+          from: 'produits',
+          localField: 'produits.produit',
+          foreignField: '_id',
+          as: 'produitDetails'
+        }
+      },
+      { $unwind: '$produitDetails' },
+      {
+        $match: {
+          'produitDetails.boutiqueId': new mongoose.Types.ObjectId(boutiqueId),
+          statut: 'Confirmée'
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          revenus: { $sum: '$total' }
+        }
+        
+      }
+    ]);
+
 
     const caJournalier = await Commande.aggregate([
       { $unwind: '$produits' },
@@ -140,13 +173,35 @@ exports.getDashboardStats = async (req, res) => {
     const nbCommande = nbCommandeData[0]?.nbCommande || 0;
     console.log('Nombre de commandes pour cette boutique:', nbCommande);
     
+    const depenses = await Depense.aggregate([
+      { $match: { boutique: objectId } },
+      {
+        $group: {
+          _id: '$type',
+          total: { $sum: '$montant' }
+        }
+      }
+    ]);
+    
+    const totalDepenses = depenses.reduce((sum, d) => sum + d.total, 0);
+
+    const revenus = chiffreAffaire[0]?.revenus || 0;
+    const benefice = revenus - totalDepenses;
+
 
     res.json({
       chiffreAffairesJournalier: caJournalier[0]?.total || 0,
       chiffreAffairesMensuel: caMensuel[0]?.total || 0,
+      chiffreAffaire,
       nombreVentes,
       produitsPlusVendus,
-      nbCommande
+      nbCommande,
+      revenus,
+      depenses,
+      totalDepenses,
+      benefice,
+      perte: benefice < 0 ? Math.abs(benefice) : 0
+      
     });
 
   } catch (error) {
