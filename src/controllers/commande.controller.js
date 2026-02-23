@@ -57,7 +57,7 @@ exports.ajouterCommande = async (req, res) => {
       const { id } = req.params;
       const { statut } = req.body;
   
-      if (!['En attente', 'Confirmée', 'Livrée','Annuler'].includes(statut)) {
+      if (!['En attente', 'Confirmée', 'Livrée','Annulée'].includes(statut)) {
         return res.status(400).json({ message: "Statut invalide" });
       }
   

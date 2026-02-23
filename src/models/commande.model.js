@@ -38,7 +38,7 @@ const CommandeSchema = new mongoose.Schema({
   },
   statut: {
     type: String,
-    enum: ['En attente', 'Confirmée', 'Livrée','Annuler'],
+    enum: ['En attente', 'Confirmée', 'Livrée','Annulée'],
     default: 'En attente'
   }
 },{ timestamps: true });
