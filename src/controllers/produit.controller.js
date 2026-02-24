@@ -1,29 +1,29 @@
 const Produit = require('../models/produit.model');
 const mongoose = require('mongoose');
 //insert
-exports.createProduit = async (req , res) =>{
-    try{
-        const produit = new Produit({
-            nom: req.body.nom,
-            prix: req.body.prix,
-            stock: req.body.stock,
-            description: req.body.description,
-            boutiqueId: req.body.boutiqueId,
-            statut: false,
-            image: req.body.image
-        });
-        await produit.save();
+exports.createProduit = async (req, res) => {
+  try {
+    const produit = new Produit({
+      nom: req.body.nom,
+      prix: req.body.prix,
+      stock: req.body.stock,
+      description: req.body.description,
+      boutiqueId: req.body.boutiqueId,
+      statut: false,
+      image: req.file ? `http://localhost:3000/uploads/${req.file.filename}` : ''
+    });
 
-        res.status(201).json({
-            message: "Produit cree",
-            produit
-        });
-    }
-    catch (error){
-        res.status(400).json({
-            message: error.message
-        });
-    }
+    await produit.save();
+
+    res.status(201).json({
+      message: "Produit créé",
+      produit
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: error.message
+    });
+  }
 };
 //liste
 exports.getProduit = async(req,res)=>{
