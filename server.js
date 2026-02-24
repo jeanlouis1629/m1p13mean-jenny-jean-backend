@@ -19,6 +19,7 @@ app.use('/api/commandes', require('./src/routes/commande.routes'));
 app.use('/api/recherche', require('./src/routes/recherche.route'));
 app.use('/api/dashboard', require('./src/routes/dashboardBoutique.routes'));
 app.use('/api/finance', require('./src/routes/finance.routes'));
+app.use('/api', require('./src/routes/facture.routes'));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>
