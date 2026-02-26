@@ -7,14 +7,13 @@ const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, 'uploads/'),
   filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
 });
-
-const upload = multer({ storage });
+const upload = multer({ storage: storage });
 router.post('/create', upload.single('image'), controller.createProduit);
 router.get('/liste', controller.getProduit);
 router.get('/liste/:id', controller.getProduitById);
 router.get('/prod/:idBoutique', controller.getProduitByIDBoutique);
 router.delete('/:id/delete', controller.deleteProduit);
-router.put('/:id/update', controller.updateProduit);
+router.put('/:id/update',upload.single('image'), controller.updateProduit);
 // router.patch('/:id/activation', controller.toggleBoutique);
 
 module.exports = router;

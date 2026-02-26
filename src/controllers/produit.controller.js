@@ -99,19 +99,39 @@ exports.getProduitByIDBoutique = async (req, res) => {
   };
           
   //update
-exports.updateProduit = async(req,res)=>{
-    try{
-      const produits = await Produit.findByIdAndUpdate(
-        req.params.id,
-        req.body,
-        {new: true}
-      );
-      res.json(produits);
-    }catch (error){
-        res.status(500).json({
-            message: 'Erreur lors de la récupération des Produits'
-          });
+exports.updateProduit = async (req, res) => {
+  try {
+    console.log('req.body:', req.body);   // ← Debug: doit contenir nom, prix, etc.
+    console.log('req.file:', req.file);   // ← Debug: doit contenir l'image
+    
+    // Construction explicite des données
+    const updateData = {};
+    
+    // Champs texte (depuis req.body)
+    if (req.body.nom) updateData.nom = req.body.nom;
+    if (req.body.prix) updateData.prix = req.body.prix;
+    if (req.body.stock) updateData.stock = req.body.stock;
+    if (req.body.description) updateData.description = req.body.description;
+    // ... autres champs
+    
+    // Image (depuis req.file)
+    if (req.file) {
+      updateData.image = req.file.filename;
     }
+    
+    console.log('Données finale:', updateData);
+
+    const produit = await Produit.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true }
+    );
+
+    res.json(produit);
+    
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 //Delete
 exports.deleteProduit = async(req,res)=>{

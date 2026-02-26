@@ -6,7 +6,7 @@ exports.globalSearch = async (req, res) => {
   try {
     const { q = '', categorie } = req.query;
 
-    console.log('Recherche:', { q, categorie });
+    const query = q.trim();
 
     const boutiqueFilter = {};
 
@@ -14,10 +14,10 @@ exports.globalSearch = async (req, res) => {
       boutiqueFilter.categorie = new mongoose.Types.ObjectId(categorie);
     }
 
-    if (q && q.trim() !== '') {
+    if (query) {
       boutiqueFilter.$or = [
-        { nom: { $regex: q, $options: 'i' } },
-        { description: { $regex: q, $options: 'i' } }
+        { nom: { $regex: query, $options: 'i' } },
+        { description: { $regex: query, $options: 'i' } }
       ];
     }
 
@@ -25,11 +25,16 @@ exports.globalSearch = async (req, res) => {
       .populate('categorie')
       .limit(20);
 
-    let produits = [];
-    if (q && q.trim() !== '') {
+    // ✅ FIX ICI
+    let produits;
+
+    if (query) {
       produits = await Produit.find({
-        nom: { $regex: q, $options: 'i' }
+        nom: { $regex: query, $options: 'i' }
       }).limit(20);
+    } else {
+      // 👉 afficher tous les produits si q vide
+      produits = await Produit.find().limit(20);
     }
 
     res.status(200).json({
