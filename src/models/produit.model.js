@@ -10,4 +10,4 @@ const ProduitSchema = new mongoose.Schema({
   image: {type: String}
 },{timestamps:true});
 
-module.exports = mongoose.model('produits', ProduitSchema,'produits');
+module.exports = mongoose.model('Produit', ProduitSchema,'produits'); 

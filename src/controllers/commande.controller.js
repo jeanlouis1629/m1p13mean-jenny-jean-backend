@@ -57,25 +57,20 @@ exports.ajouterCommande = async (req, res) => {
       const { id } = req.params;
       const { statut } = req.body;
   
-      if (!['En attente', 'Confirmée', 'Livrée','Annulée'].includes(statut)) {
+      if (!['En attente', 'Confirmée', 'Livrée', 'Annulée'].includes(statut)) {
         return res.status(400).json({ message: "Statut invalide" });
       }
   
-      const commande = await Commande.findById(id);
+      const commande = await Commande.findById(id).populate('produits.produit');
   
       if (!commande) {
         return res.status(404).json({ message: "Commande introuvable" });
       }
   
-      if (statut === "Confirmée" && commande.statut !== "Confirmée") {
-  
+      const ancienStatut = commande.statut;
+      if (ancienStatut !== 'Confirmée' && statut === 'Confirmée') {
         for (let item of commande.produits) {
-  
-          const produit = await Produit.findById(item.produit);
-  
-          if (!produit) {
-            return res.status(404).json({ message: "Produit introuvable" });
-          }
+          const produit = item.produit;
   
           if (produit.stock < item.quantite) {
             return res.status(400).json({
@@ -84,6 +79,15 @@ exports.ajouterCommande = async (req, res) => {
           }
   
           produit.stock -= item.quantite;
+          await produit.save();
+        }
+      }
+  
+      if (ancienStatut === 'Confirmée' && statut === 'Annulée') {
+        for (let item of commande.produits) {
+          const produit = item.produit;
+  
+          produit.stock += item.quantite;
           await produit.save();
         }
       }
@@ -111,7 +115,7 @@ exports.ajouterCommande = async (req, res) => {
         .populate('acheteur')
         .populate({
           path: 'produits.produit',
-          model: 'produits'
+          model: 'Produit'
         });
   
       const commandesFiltrees = commandes
@@ -146,7 +150,7 @@ exports.ajouterCommande = async (req, res) => {
         .populate('acheteur')
         .populate({
           path: 'produits.produit',
-          model: 'produits'})
+          model: 'Produit'})
         .sort({ createdAt: -1 });
         res.status(201).json({
           message: "historique de commande",

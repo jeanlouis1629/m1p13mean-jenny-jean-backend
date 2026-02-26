@@ -15,7 +15,7 @@ exports.genererFacture = async (req, res) => {
       .populate('acheteur')
       .populate({
         path: 'produits.produit',
-        model: 'produits'
+        model: 'Produit'
       });
 
     if (!commande) {
