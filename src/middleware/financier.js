@@ -1,4 +1,3 @@
-// src/services/finance.service.js
 const Depense = require('../models/depense.model');
 const Commande = require('../models/commande.model');
 const Boutique = require('../models/boutique.model');
@@ -76,5 +75,68 @@ for (const commande of commandes) {
     },
     commissions: totalCommissions,
     revenuCentre
+  };
+};
+
+exports.performanceParBoutique = async (mois) => {
+
+  const debut = new Date(`${mois}-01`);
+  const fin = new Date(debut);
+  fin.setMonth(fin.getMonth() + 1);
+
+  const boutiques = await Boutique.find({ active: true });
+
+  const resultats = [];
+
+  for (const boutique of boutiques) {
+
+
+    const commandes = await Commande.find({
+      statut: { $in: ['Confirmée', 'Livrée'] },
+      createdAt: { $gte: debut, $lt: fin }
+    }).populate({
+      path: 'produits.produit',
+      match: { boutiqueId: boutique._id }
+    });
+
+    let chiffreAffaire = 0;
+
+    for (const commande of commandes) {
+      for (const item of commande.produits) {
+
+        if (!item.produit) continue;
+
+        const prix = Number(item.produit.prix) || 0;
+        const quantite = Number(item.quantite) || 0;
+
+        chiffreAffaire += prix * quantite;
+      }
+    }
+
+    const depenses = await Depense.find({
+      boutique: boutique._id,
+      date: { $gte: debut, $lt: fin }
+    });
+
+    const totalCharges = depenses.reduce(
+      (sum, d) => sum + (Number(d.montant) || 0),
+      0
+    );
+
+    const profit = chiffreAffaire - totalCharges;
+
+    resultats.push({
+      boutique: boutique.nom,
+      chiffreAffaire,
+      charges: totalCharges,
+      profit,
+      statut: profit >= 0 ? "PROFIT" : "PERTE"
+    });
+  }
+
+  return {
+    mois,
+    totalBoutiques: resultats.length,
+    performances: resultats
   };
 };
