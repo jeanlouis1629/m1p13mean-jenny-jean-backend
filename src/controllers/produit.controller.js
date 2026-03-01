@@ -157,3 +157,52 @@ exports.deleteProduit = async(req,res)=>{
     });
     }  
 };
+exports.getProduitPromo = async (req, res) => {
+  try {
+
+    const produits = await Produit.find().populate('boutiqueId');
+
+    const now = new Date();
+
+    const produitsAvecPromo = produits.map(p => {
+
+      let prixFinal = p.prix;
+
+      if (
+        p.promotion > 0 &&
+        p.dateDebutPromo &&
+        p.dateFinPromo &&
+        now >= p.dateDebutPromo &&
+        now <= p.dateFinPromo
+      ) {
+        prixFinal = p.prix - (p.prix * p.promotion / 100);
+      }
+
+      return {
+        ...p._doc,
+        prixFinal
+      };
+    });
+
+    res.json(produitsAvecPromo);
+
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
+exports.setPromotion = async (req, res) => {
+
+  const { promotion, dateDebutPromo, dateFinPromo } = req.body;
+
+  const produit = await Produit.findByIdAndUpdate(
+    req.params.id,
+    {
+      promotion,
+      dateDebutPromo,
+      dateFinPromo
+    },
+    { new: true }
+  );
+
+  res.json(produit);
+};
