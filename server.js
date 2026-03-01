@@ -25,5 +25,5 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>
-  console.log(`Serveur backend lancé sur http://localhost:${PORT}`)
+  console.log(`Serveur backend lancé sur ${PORT}`)
 );
