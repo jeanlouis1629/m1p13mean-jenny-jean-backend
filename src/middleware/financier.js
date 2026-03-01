@@ -28,6 +28,16 @@ exports.financeParMois = async (mois) => {
     b => !boutiquesAyantPaye.includes(b._id.toString())
   );
 
+  const depensesCentre = await Depense.find({
+    type: 'CHARGES',
+    date: { $gte: debut, $lt: fin }
+  });
+
+  const totalChargesCentre = depensesCentre.reduce(
+    (sum, d) => sum + (Number(d.montant) || 0),
+    0
+  );
+
   const commandes = await Commande.find({
     statut: { $in: ['Confirmée', 'Livrée'] },
     createdAt: { $gte: debut, $lt: fin }
@@ -62,6 +72,7 @@ for (const commande of commandes) {
 }
 
   const revenuCentre = totalLoyersPayes + totalCommissions;
+  const benefices = revenuCentre - totalChargesCentre;
 
   return {
     mois,
@@ -74,7 +85,9 @@ for (const commande of commandes) {
       boutiques: loyersImpayes
     },
     commissions: totalCommissions,
-    revenuCentre
+    revenuCentre,
+    benefices,
+    totalChargesCentre
   };
 };
 

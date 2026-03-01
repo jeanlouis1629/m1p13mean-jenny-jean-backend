@@ -15,8 +15,6 @@ exports.mouvementStock = async (req, res) => {
     if (!produit) {
       return res.status(404).json({ message: "Produit introuvable" });
     }
-
-    // 🔥 Gestion logique du stock
     if (typeMouvement === 'ENTREE') {
       produit.stock += quantite;
     } 
