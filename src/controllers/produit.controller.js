@@ -10,7 +10,7 @@ exports.createProduit = async (req, res) => {
       description: req.body.description,
       boutiqueId: req.body.boutiqueId,
       statut: false,
-      image: req.file ? `http://localhost:3000/uploads/${req.file.filename}` : ''
+      image: req.file ? `https://m1p13mean-jenny-jean-backend-1.onrender.com/uploads/${req.file.filename}` : ''
     });
 
     await produit.save();
