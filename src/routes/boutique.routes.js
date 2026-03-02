@@ -8,7 +8,7 @@ router.get('/user/:owner', controller.getBoutiqueUser);
 router.delete('/:id/delete', controller.deleteBoutique);
 router.put('/:id/update', controller.updateBoutique);
 router.patch('/:id/activation', controller.toggleBoutique);
-router.get('/financeparboutique', controller.financeBoutique);
+router.post('/financeparboutique', controller.financeBoutique);
 router.get('/stats/count', controller.getNombreBoutique);
 
 module.exports = router;
