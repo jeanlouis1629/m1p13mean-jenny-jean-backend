@@ -208,11 +208,11 @@ exports.toggleProduit = async (req, res) => {
     return res.status(404).json({ message: 'produit introuvable' });
   }
 
-  const newStatus = !produit.active;
+  const newStatus = !produit.statut;
 
   await Produit.findByIdAndUpdate(
     req.params.id,
-    { active: newStatus },
+    { statut: newStatus },
     { new: true }
   );
 
