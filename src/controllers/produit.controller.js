@@ -202,3 +202,22 @@ exports.setPromotion = async (req, res) => {
 
   res.json(produit);
 };
+exports.toggleProduit = async (req, res) => {
+  const produit = await Produit.findById(req.params.id);
+  if (!produit) {
+    return res.status(404).json({ message: 'produit introuvable' });
+  }
+
+  const newStatus = !produit.active;
+
+  await Produit.findByIdAndUpdate(
+    req.params.id,
+    { active: newStatus },
+    { new: true }
+  );
+
+  res.json({
+    message: newStatus ? 'Produit activée' : 'Produit désactivée',
+    active: newStatus
+  });
+};

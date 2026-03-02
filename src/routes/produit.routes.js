@@ -16,6 +16,7 @@ router.get('/prod/:idBoutique', controller.getProduitByIDBoutique);
 router.delete('/:id/delete', controller.deleteProduit);
 router.put('/:id/update',upload.single('image'), controller.updateProduit);
 router.patch('/promo/:id', controller.setPromotion);
+router.patch('/activation/:id', controller.toggleProduit);
 // router.patch('/:id/activation', controller.toggleBoutique);
 
 module.exports = router;
