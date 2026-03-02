@@ -160,46 +160,42 @@ exports.deleteProduit = async(req,res)=>{
 exports.getProduitPromo = async (req, res) => {
   try {
 
-    const produits = await Produit.find().populate('boutiqueId');
-
-    const now = new Date();
+    const produits = await Produit.find({ statut: true })
+      .populate('boutiqueId');
 
     const produitsAvecPromo = produits.map(p => {
 
       let prixFinal = p.prix;
+      let montantReduction = 0;
 
-      if (
-        p.promotion > 0 &&
-        p.dateDebutPromo &&
-        p.dateFinPromo &&
-        now >= p.dateDebutPromo &&
-        now <= p.dateFinPromo
-      ) {
-        prixFinal = p.prix - (p.prix * p.promotion / 100);
+      if (p.activepromo && p.promotion > 0) {
+        montantReduction = (p.prix * p.promotion) / 100;
+        prixFinal = p.prix - montantReduction;
       }
 
       return {
         ...p._doc,
-        prixFinal
+        prixFinal,
+        montantReduction
       };
     });
 
     res.json(produitsAvecPromo);
 
   } catch (error) {
+    console.error("Erreur getProduitPromo :", error);
     res.status(500).json({ message: "Erreur serveur" });
   }
 };
 exports.setPromotion = async (req, res) => {
 
-  const { promotion, dateDebutPromo, dateFinPromo } = req.body;
+  const { promotion, activepromo} = req.body;
 
   const produit = await Produit.findByIdAndUpdate(
     req.params.id,
     {
-      promotion,
-      dateDebutPromo,
-      dateFinPromo
+      promotion: promotion || 0,
+      activepromo: activepromo ?? false
     },
     { new: true }
   );
