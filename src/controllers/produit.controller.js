@@ -112,7 +112,7 @@ exports.updateProduit = async (req, res) => {
     if (req.body.prix) updateData.prix = req.body.prix;
     if (req.body.stock) updateData.stock = req.body.stock;
     if (req.body.description) updateData.description = req.body.description;
-    if (req.body.statut) updateData.statut = req.body.statut;
+    if (req.body.activepromo) updateData.activepromo = req.body.activepromo;
     if (req.body.promotion) updateData.promotion = req.body.promotion;
     // ... autres champs
     
