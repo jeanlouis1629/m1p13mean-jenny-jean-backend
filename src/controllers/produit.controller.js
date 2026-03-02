@@ -101,40 +101,61 @@ exports.getProduitByIDBoutique = async (req, res) => {
   //update
 exports.updateProduit = async (req, res) => {
   try {
-    console.log('req.body:', req.body);   // ← Debug: doit contenir nom, prix, etc.
-    console.log('req.file:', req.file);   // ← Debug: doit contenir l'image
-    
-    // Construction explicite des données
+    console.log('=== UPDATE PRODUIT ===');
+    console.log('ID:', req.params.id);
+    console.log('Body:', req.body);
+
     const updateData = {};
+    const { nom, prix, stock, description, activepromo, promotion } = req.body;
+
+    // Champs optionnels - on vérifie l'existence, pas la valeur
+    if (nom !== undefined) updateData.nom = nom;
+    if (prix !== undefined) updateData.prix = Number(prix);
+    if (stock !== undefined) updateData.stock = Number(stock);
+    if (description !== undefined) updateData.description = description;
     
-    // Champs texte (depuis req.body)
-    if (req.body.nom) updateData.nom = req.body.nom;
-    if (req.body.prix) updateData.prix = req.body.prix;
-    if (req.body.stock) updateData.stock = req.body.stock;
-    if (req.body.description) updateData.description = req.body.description;
-    if (req.body.activepromo) updateData.activepromo = req.body.activepromo;
-    if (req.body.promotion) updateData.promotion = req.body.promotion;
-    // ... autres champs
+    // ✅ Gestion explicite de activepromo (peut être "true", "false", true, false)
+    if (activepromo !== undefined) {
+      // Multer envoie souvent des strings avec multipart/form-data
+      const boolValue = activepromo === 'true' || activepromo === true;
+      updateData.activepromo = boolValue;
+      console.log('activepromo converti:', activepromo, '→', boolValue);
+    }
     
-    // Image (depuis req.file)
+    if (promotion !== undefined) {
+      updateData.promotion = Number(promotion);
+    }
+
     if (req.file) {
       updateData.image = req.file.filename;
     }
-    
-    console.log('Données finale:', updateData);
+
+    console.log('UpdateData final:', updateData);
+
+    // Vérifier s'il y a quelque chose à mettre à jour
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ message: 'Aucune donnée à mettre à jour' });
+    }
 
     const produit = await Produit.findByIdAndUpdate(
       req.params.id,
-      updateData,
-      { new: true }
+      { $set: updateData },  // $set pour être explicite
+      { new: true, runValidators: true }
     );
 
+    if (!produit) {
+      return res.status(404).json({ message: 'Produit non trouvé' });
+    }
+
+    console.log('Produit mis à jour:', produit);
     res.json(produit);
     
   } catch (error) {
+    console.error('Erreur update:', error);
     res.status(500).json({ message: error.message });
   }
 };
+
 //Delete
 exports.deleteProduit = async(req,res)=>{
     try {
