@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
 const Boutique = require('../models/boutique.model');
-const Performance =require('../models/performance.model');
 const Categorie = require('../models/CategorieBoutique');
+const Commande = require('../models/commande.model');
+const Depense = require('../models/depense.model');
+const Produit = require('../models/produit.model');
 const User = require('../models/user.model');
 
 exports.createBoutique = async (req, res) => {
@@ -160,30 +162,6 @@ exports.toggleBoutique = async (req, res) => {
   });
 };
 
-//chiffreDaffaire
-exports.getPerformance = async (req, res) => {
-    const { id, mois, annee } = req.params;
-
-    const boutique = await Boutique.findById(id);
-    if (!boutique) return res.status(404).json({ message: 'Boutique introuvable' });
-
-    const perf = await Performance.findOne({ boutique: id, mois, annee });
-    if (!perf) return res.json({ message: 'Aucune donnée pour ce mois' });
-
-    const commission = perf.chiffreAffaire * boutique.tauxCommission / 100;
-    const chargesTotales = boutique.loyerMensuel + perf.charges;
-    const profit = perf.chiffreAffaire - chargesTotales - commission;
-
-    res.json({
-      boutique: boutique.nom,
-      mois,
-      annee,
-      chiffreAffaire: perf.chiffreAffaire,
-      charges: perf.charges,
-      commission,
-      profit
-  });
-};
 //Nombre total boutique
 exports.getNombreBoutique = async(req,res)=>{
   try {
@@ -202,4 +180,98 @@ exports.getNombreBoutique = async(req,res)=>{
       message: "Erreur lors du calcul des statistiques"
     });
   }
+};
+
+exports.financeBoutique = async (req, res) => {
+
+  try {
+
+    const userId = req.body.userId;
+
+    const boutique = await Boutique.findOne({ owner: userId });
+
+    if (!boutique) {
+      return res.status(404).json({
+        message: "Boutique non trouvée"
+      }); 
+    }
+
+    const boutiqueId = boutique._id;
+
+    const commandes = await Commande.find({
+      statut: { $in: ['Confirmée', 'Livrée'] }
+    }).populate({
+      path: 'produits.produit',
+      model: 'Produit'
+    });
+
+    let chiffreAffaire = 0;
+
+    for (const cmd of commandes) {
+
+      for (const item of cmd.produits) {
+
+        if (!item.produit) continue;
+
+        if (item.produit.boutiqueId.toString() === boutiqueId.toString()) {
+
+          const prix = item.produit.prix || 0;
+          const quantite = item.quantite || 0;
+
+          chiffreAffaire += prix * quantite;
+        }
+
+      }
+
+    }
+
+    // récupérer dépenses
+    const depenses = await Depense.find({ boutique: boutiqueId });
+
+    let totalDepense = 0;
+
+    const detailDepense = [];
+
+    depenses.forEach(d => {
+
+      totalDepense += d.montant;
+
+      detailDepense.push({
+        type: d.type,
+        montant: d.montant,
+        description: d.description,
+        date: d.date
+      });
+
+    });
+
+    const profit = chiffreAffaire - totalDepense;
+
+    const statut = profit >= 0 ? "Bénéfice" : "Perte";
+
+    res.json({
+
+      boutique: boutique.nom,
+
+      chiffreAffaire,
+
+      depensesTotal: totalDepense,
+
+      detailDepense,   // tableau
+
+      profit,
+
+      statut
+
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: "Erreur serveur",
+      error: error.message
+    });
+
+  }
+
 };
